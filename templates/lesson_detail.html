@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ lesson.title }}</h1>
+<p>{{ lesson.description }}</p>
+<p><strong>Predmet:</strong> {{ lesson.subject }}</p>
+<p><strong>Úroveň:</strong> {{ lesson.level }}</p>
+
+{% if lesson.subject == 'Level_A' %}
+    <p style="color: #cc6600; font-weight: bold;"><strong>Cena:</strong> Určuje školitel</p>
+{% endif %}
+
+<h3>
+    Školiteľ{{trainers|length > 1 and 'ia' or ''}}
+</h3>
+<ul>
+    {% for trainer in trainers %}
+    <li>
+        {% if trainer.member %}
+            {{trainer.member.full_name}}
+            {% if trainer.member.email %}
+                <a href="mailto:{{ trainer.member.email }}?subject=Mám%20záujem%20o%20lekciu%20{{ lesson.title|urlencode }}">
+                    Napísať školitelovi
+                </a>
+            {% endif %}
+        {% else %}
+            {{ trainer.username}}
+        {% endif %}
+    </li>
+    {% else %}
+    <li>Žiadni školitelia nepriradení.</li>
+    {% endfor %}
+</ul>
+
+<a href="{{ url_for('index') }}">Späť na zoznam lekcií</a>
+{% endblock %}

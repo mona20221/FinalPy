@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Spoločné vzdelávanie{% endblock %}
+
+{% block content %}
+<h1 class="mb-4" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1a237e;">Vitajte na stránke <strong>SpeedLearn</strong></h1>
+
+<div style="background-color: #e6f2ff; border-left: 4px solid #007bff; padding: 1rem; border-radius: 5px; margin-top: 1rem;">
+  <p class="lead" style="font-style: italic; margin-bottom: 1.5rem;">
+    Organizujte spoločné vzdelávanie s ostatnými študentmi alebo školiteľmi. V ponuke sú kurzy realizované odborníkmi alebo aj interaktívne vzájomné doučovanie na ktorom sa môže dohodnúť skupina záujemcov.
+  </p>
+  <p style="background-color: #d0e7ff; border-left: 4px solid #004a99; padding: 0.75rem 1rem; border-radius: 4px; font-weight: 600; color: #003366; margin: 0;">
+    Úroveň školitelia profesionála je <strong>Level_A - profesional</strong>. Tento druh školenia môže byť spoplatnený. Cenu určuje konkrétny školiteľ.
+  </p>
+
+  <p style="background-color: #f0f8ff; border-left: 4px solid #3399ff; padding: 0.75rem 1rem; border-radius: 4px; font-weight: 600; color: #004080; margin-top: 1rem;">
+    Hľadáte kamoša, ktorý má rovnaký problém ako ty? Neviete správne aplikovať algoritmy alebo matiku? <strong>Zaregistruj sa a hľadaj s kým sa budeš učiť na skúšku.</strong>
+  </p>
+</div>
+<div class="mb-3">
+  <h4 class="mb-2">Aktuálna ponuka vzdelávania</h4>
+  <a href="{{ url_for(current_user.is_authenticated and 'create_lesson' or 'login') }}"
+     class="btn btn-primary">+ Vytvoriť novú lekciu</a>
+  {% if not current_user.is_authenticated %}
+    <p class="text-muted mt-2"><em>Pre vytvorenie ponuky sa najprv prihlás.</em></p>
+  {% endif %}
+</div>
+
+{% if lessons %}
+  <div class="row justify-content-center">
+    {% for lesson in lessons %}
+    <div class="col-md-4 mb-3">
+      <div class="card mb-3 shadow-sm" style="background-color: #e9f3ff; font-size: 0.95rem;">
+        <div class="card-body p-3">
+          <h5 class="card-title" style="font-size: 1.1rem; font-weight: 600;">
+            {{ lesson.title }} ({{ lesson.subject }})
+          </h5>
+          <p class="card-text mb-2">{{ lesson.description or 'Bez popisu.' }}</p>
+          <p class="card-text mb-3"><strong>Úroveň:</strong> {{ lesson.level }}</p>
+          <a href="{{ url_for('view_lesson', lesson_id=lesson.id) }}" class="btn btn-sm btn-outline-primary">Zobraziť detail</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="text-muted">Zatiaľ neexistujú žiadne lekcie.</p>
+{% endif %}
+{% endblock %}

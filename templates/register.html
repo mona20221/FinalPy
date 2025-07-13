@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Registrácia{% endblock %}
+
+{% block content %}
+
+<style>
+  .text-darkblue {
+    color: #003366;
+  }
+</style>
+
+<div class="container mt-4">
+  <div class="card shadow-sm border-0" style="border-left: 5px solid #003366;">
+    <div class="card-body">
+      <h2 class="card-title mb-4" style="color: #003366; font-weight: bold;">Registrácia</h2>
+
+      <form method="post">
+        <div class="mb-3">
+          <label for="first_name" class="form-label" style="color: #003366;" >Meno</label>
+          <input type="text" class="form-control" id="first_name" name="first_name" required />
+        </div>
+
+        <div class="mb-3">
+          <label for="last_name" class="form-label" style="color: #003366;">Priezvisko</label>
+          <input type="text" class="form-control" id="last_name" name="last_name" required />
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label" style="color: #003366;">Email</label>
+          <input type="email" class="form-control" id="email" name="email" required />
+        </div>
+
+        <div class="mb-3">
+          <label for="username" class="form-label" style="color: #003366;">Používateľské meno</label>
+          <input type="text" class="form-control" id="username" name="username" required />
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label" style="color: #003366;">Heslo</label>
+          <input type="password" class="form-control" id="password" name="password" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Registrovať sa</button>
+      </form>
+
+      <p class="mt-3" style="color: #003366;">Už máte účet? <a href="{{ url_for('login') }}">Prihláste sa tu</a>.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
