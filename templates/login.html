@@ -7,30 +7,95 @@
   .text-darkblue {
     color: #003366;
   }
+
+  .login-container {
+    max-width: 800px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin: 40px auto;
+  }
+
+  .sign-in-image-wrapper {
+    border: 3px solid #003366;       /* modrý pásik okolo */
+    padding: 8px;
+    border-radius: 8px;
+    background-color: #f8f9fa;       /* svetlý podklad */
+    max-width: 180px;
+  }
+
+  .sign-in-image {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .login-card {
+    flex: 1;
+    border-left: 5px solid #003366;
+  }
 </style>
 
-<div class="container mt-4 d-flex justify-content-center">
-  <div class="card shadow-sm border-0" style="border-left: 5px solid #003366; max-width: 480px; width: 100%;">
-    <div class="card-body">
-      <h2 class="card-title mb-4 text-darkblue fw-bold">Prihlásenie</h2>
+<div class="container mt-4">
+  <div class="login-container">
 
-      <form method="post">
-        <div class="mb-3">
-          <label for="username" class="form-label text-darkblue">Používateľské meno</label>
-          <input type="text" class="form-control" id="username" name="username" required />
-        </div>
+    <!-- Obrázok s rámikom -->
+    <div class="sign-in-image-wrapper">
+      <img src="{{ url_for('static', filename='images/sign.jpg') }}" alt="Prihlásenie" class="sign-in-image" />
+    </div>
 
-        <div class="mb-3">
-          <label for="password" class="form-label text-darkblue">Heslo</label>
-          <input type="password" class="form-control" id="password" name="password" required />
-        </div>
+    <!-- Prihlasovací formulár -->
+    <div class="card shadow-sm border-0 login-card">
+      <div class="card-body">
+        <h2 class="card-title mb-4 text-darkblue fw-bold">Prihlásenie</h2>
 
-        <button type="submit" class="btn btn-primary w-100">Prihlásiť sa</button>
-      </form>
+        <form method="post">
+          <div class="mb-3">
+            <label for="username" class="form-label text-darkblue">Používateľské meno</label>
+            <input type="text" class="form-control" id="username" name="username" required />
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label text-darkblue">Heslo</label>
+            <input type="password" class="form-control" id="password" name="password" required />
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">Prihlásiť sa</button>
+        </form>
+
+        <p class="mt-3 text-darkblue">
+          <a href="#" data-bs-toggle="modal" data-bs-target="#resetPasswordModal" class="text-darkblue">Zabudnuté heslo?</a>
+        </p>
+      </div>
     </div>
   </div>
 </div>
 
+<!-- Modal zostáva rovnaký -->
+<div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="post" action="{{ url_for('reset_password') }}">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-darkblue" id="resetPasswordModalLabel">Obnovenie hesla</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavrieť"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="emailReset" class="form-label text-darkblue">Zadajte svoj email</label>
+            <input type="email" class="form-control" id="emailReset" name="email" required placeholder="napr. email@example.com" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušiť</button>
+          <button type="submit" class="btn btn-primary">Poslať odkaz</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Confirm JS -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     {% for category, message in get_flashed_messages(with_categories=true) %}

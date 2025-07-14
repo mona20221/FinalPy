@@ -72,12 +72,12 @@ def register():
         )
         db.session.add(member)
         db.session.flush()  # načítaj member.id
-
+        print("ID nového člena:", member.member_id)
         # Vytvor používateľa naviazaného na člena
         user = User(
             username=username,
             password_hash=hashed_pw,
-            member_id=member.id
+            member_id=member.member_id
         )
         db.session.add(user)
 
@@ -102,19 +102,29 @@ def login():
         user = User.query.filter_by(username=username).first()
         if not user:
             flash('Používateľ neexistuje. Chcete sa zaregistrovať?', 'confirm')
-            return redirect(url_for('login'))
+            return redirect(url_for('login', confirm_shown='true'))
 
         if user and user.check_password(password):
             login_user(user)
-            flash('Prihlásenie úspešné.')
+            flash('Prihlásenie úspešné.', 'success')
             return redirect(url_for('index'))
 
-        flash('Neplatné prihlasovacie údaje.')
+        flash('Neplatné prihlasovacie údaje.', 'danger')
 
     return render_template('login.html')
 
+# Reset password
+@app.route('/reset-password', methods= ['GET', 'POST'])
+def reset_password():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        flash('Ak váš účet existuje, poslali sme na váš email inštrukcie k resetu hesla.', 'info')
+        return redirect(url_for('login'))
+
+    return render_template('reset_password.html')
+
 # Odhlásenie
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
 @login_required
 def logout():
     logout_user()
