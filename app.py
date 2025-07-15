@@ -2,7 +2,7 @@ from flask import Flask
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 from extensions import db, bcrypt
-from models import User, Member, Lesson, LessonRegistration, LessonTrainer, Message
+from models import User, Member, Lesson, LessonRegistration, LessonTrainer, Message, Student, StudentLesson
 from datetime import datetime
 
 
@@ -36,6 +36,8 @@ def index():
 
 @app.route('/lessons/create', methods=['GET', 'POST'])
 def create_lesson():
+    # if request.method == 'POST':
+
     # Tu bude logika na vytvorenie novej lekcie
     return "Tu bude formulár na vytvorenie lekcie"
 

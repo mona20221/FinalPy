@@ -7,7 +7,7 @@ class LessonRegistration(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     registered_at = db.Column(db.DateTime, server_default=db.func.now())
 
-    __table_args__ = (db.UniqueConstraint('lesson_id', 'user_id', name='_lesson_user_uc'),)
+    __table_args__ = (db.UniqueConstraint('lesson_id', 'user_id', name='unique_lesson_user'),)
 
     lesson = db.relationship('Lesson', back_populates='registrations')
     user = db.relationship('User')
