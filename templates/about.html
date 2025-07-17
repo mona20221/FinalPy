@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}O nás{% endblock %}
+
+{% block content %}
+<div class="container about-section">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow-lg border-info-subtle">
+                <div class="card-body p-4">
+                    <h1 class="text-primary mb-4">O nás</h1>
+                    <p>Sme nezisková organizácia, ktorá vytvára platformy pre rôzne podujatia. Zároveň sme tím nadšencov pre moderné vzdelávanie. Veríme, že každý má právo na kvalitné vzdelanie bez ohľadu na vek, pôvod či schopnosti.</p>
+
+                    <h3 class="text-info mt-4">Cieľ projektu</h3>
+                    <p>Cieľom tohto projektu je vytvoriť platformu, kde sa môžu študenti a školitelia stretávať, zdieľať vedomosti a spoločne rásť. Podporujeme aktívne a spoločné vzdelávanie založené na spolupráci.</p>
+
+                    <h3 class="text-info mt-4">Kontakt</h3>
+                    <ul class="list-unstyled">
+                        <li><strong>Email:</strong> <a href="mailto:info@speedlearn.sk">info@speedlearn.sk</a></li>
+                        <li><strong>Telefón:</strong> +421 901 234 567</li>
+                        <li><strong>Adresa:</strong> Vzdelávacia ulica 42, 821 01 Bratislava</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .about-section {
+        background-image:
+        linear-gradient(to bottom, #cce7ff 0%, transparent 20%, transparent 80%, #cce7ff 100%),
+        linear-gradient(to right, #cce7ff 0%, transparent 20%, transparent 80%, #cce7ff 100%),
+        url('{{ url_for("static", filename="images/happy.png") }}');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        color: #003366;
+    }
+
+    .bg-opacity-75 {
+        background-color: rgba(255, 255, 255, 0.75) !important;
+    }
+</style>
+{% endblock %}

@@ -17,7 +17,7 @@
   </p>
 </div>
 <div class="mb-3">
-  <h4 class="mb-2">Aktuálna ponuka vzdelávania</h4>
+  <h4 class="mb-2 style=color: #153a61;">Aktuálna ponuka vzdelávania</h4>
   <a href="{{ url_for(current_user.is_authenticated and 'create_lesson' or 'login') }}"
      class="btn btn-primary">+ Vytvoriť novú lekciu</a>
   {% if not current_user.is_authenticated %}

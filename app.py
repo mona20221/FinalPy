@@ -2,7 +2,7 @@ from flask import Flask
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 from extensions import db, bcrypt
-from models import User, Member, Lesson, LessonRegistration, LessonTrainer, Message, Student, StudentLesson
+from models import User, Member, Lesson, LessonRegistration, LessonTrainer, Message, Student, StudentLesson, LessonTermin
 from datetime import datetime
 
 
@@ -31,8 +31,65 @@ def inject_now():
 # Domovská stránka
 @app.route('/')
 def index():
-    lessons = Lesson.query.order_by(Lesson.created_at.desc()).all()
+    lessons = Lesson.query.filter_by(status='active').order_by(Lesson.created_at.desc()).all()
     return render_template('index.html', lessons=lessons)
+
+
+@app.route('/lessons/<int:lesson_id>')
+def view_lesson(lesson_id):
+    lesson = Lesson.query.filter_by(id=lesson_id,status='active').first_or_404()
+
+    trainers=[lt.user for lt in LessonTrainer.query.filter_by(lesson_id=lesson.id).all()]
+
+    students_links = StudentLesson.query.filter_by(lesson_id=lesson.id).all()
+
+    # vsetky terminy naraz
+    termin_ids = [sl.termin_id for sl in students_links if sl.termin_id]
+
+    # vsetky terminy ulozim do slovnika
+    termins = {t.id: t for t in LessonTermin.query.filter(LessonTermin.id.in_(termin_ids)).all()}
+
+    students_with_termin = []
+    for sl in students_links:
+        termin = termins.get(sl.termin_id)
+        students_with_termin.append({
+            'student': sl.student,
+            'termin_datum': termin.datum if termin else None
+        })
+
+    terminy = lesson.terminy
+
+    return render_template('lesson_detail.html', lesson=lesson, trainers=trainers, students_with_termin=students_with_termin, terminy=terminy)
+
+@app.route('/lessons/<int:lesson_id>/join', methods=['POST'])
+@login_required
+def join_lesson(lesson_id):
+    lesson = Lesson.query.filter_by(id=lesson_id, status='active').first_or_404()
+
+    # ak student neexistuje, vytvor ho - ma rovnake id ako user
+    student = Student.query.get(current_user.id)
+    if not student:
+        student = Student(student_id=current_user.id)
+        db.session.add(student)
+        db.session.commit()
+
+    # overenie ci je student prihlaseny
+    already_joined = StudentLesson.query.filter_by(
+        lesson_id = lesson.id,
+        student_id = current_user.id
+    ).first()
+
+    if already_joined:
+        flash('Už ste prihlásený na tento kurz.', 'info')
+    else:
+        new_entry = StudentLesson(student_id=current_user.id, lesson_id=lesson.id)
+        db.session.add(new_entry)
+        db.session.commit()
+        flash('Úspešne ste sa prihlásili na kurz.', 'success')
+
+    return redirect(url_for('view_lesson', lesson_id=lesson.id))
+
+
 
 @app.route('/lessons/create', methods=['GET', 'POST'])
 def create_lesson():
@@ -41,11 +98,7 @@ def create_lesson():
     # Tu bude logika na vytvorenie novej lekcie
     return "Tu bude formulár na vytvorenie lekcie"
 
-@app.route('/lessons/<int:lesson_id>')
-def view_lesson(lesson_id):
-    lesson = Lesson.query.get_or_404(lesson_id)
-    trainers=[lt.user for lt in LessonTrainer.query.filter_by(lesson_id=lesson.id).all()]
-    return render_template('lesson_detail.html', lesson=lesson, trainers=trainers)
+
 
 # Registrácia
 @app.route('/register', methods=['GET', 'POST'])
@@ -132,6 +185,10 @@ def logout():
     logout_user()
     flash('Odhlásili ste sa.')
     return redirect(url_for('index'))
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

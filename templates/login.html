@@ -3,6 +3,7 @@
 {% block title %}Prihlásenie{% endblock %}
 
 {% block content %}
+
 <style>
   .text-darkblue {
     color: #003366;
@@ -17,17 +18,38 @@
   }
 
   .sign-in-image-wrapper {
-    border: 3px solid #003366;       /* modrý pásik okolo */
+    border: 3px solid #003366;
     padding: 8px;
     border-radius: 8px;
-    background-color: #f8f9fa;       /* svetlý podklad */
+    background-color: #f8f9fa;
     max-width: 180px;
+    overflow: hidden;
+    position: relative;
   }
 
   .sign-in-image {
     width: 100%;
     height: auto;
     display: block;
+    position: relative;
+    animation: flyRight 3s ease forwards;
+    /* Jemný filter na utlmenie farieb */
+    filter: brightness(0.85) saturate(0.7);
+  }
+
+  @keyframes flyRight {
+    0% {
+      left: 100px;
+      opacity: 1;
+    }
+    100% {
+      left: 100%
+      opacity: 1;
+    }
+    100% {
+      left: 0;
+      opacity: 1;
+    }
   }
 
   .login-card {
@@ -39,7 +61,7 @@
 <div class="container mt-4">
   <div class="login-container">
 
-    <!-- Obrázok s rámikom -->
+
     <div class="sign-in-image-wrapper">
       <img src="{{ url_for('static', filename='images/sign.jpg') }}" alt="Prihlásenie" class="sign-in-image" />
     </div>
@@ -71,7 +93,7 @@
   </div>
 </div>
 
-<!-- Modal zostáva rovnaký -->
+
 <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <form method="post" action="{{ url_for('reset_password') }}">
@@ -95,7 +117,7 @@
   </div>
 </div>
 
-<!-- Confirm JS -->
+<!-- potvrdenie cez JS -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     {% for category, message in get_flashed_messages(with_categories=true) %}

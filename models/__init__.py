@@ -6,3 +6,4 @@ from .lesson_registrations import LessonRegistration
 from .messages import Message
 from .students import Student
 from .student_lessons import StudentLesson
+from .lesson_termin import LessonTermin

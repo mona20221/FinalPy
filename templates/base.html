@@ -23,7 +23,12 @@
         footer {
             flex-shrink: 0;
         }
+
     </style>
+    {% block styles %}
+
+    {% endblock %}
+
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -35,6 +40,7 @@
     <div>
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Domov</a></li>
+             <li class="nav-item"><a class="nav-link" href="{{ url_for('about') }}">O nás</a></li>
             {% if current_user.is_authenticated %}
             <li class="nav-item d-flex align-items-center">
                 <form action="{{ url_for('logout') }}" method="post" style="display:inline;">
