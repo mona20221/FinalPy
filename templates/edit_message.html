@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Upraviť správu</h3>
+
+<form method="post">
+    <div class="mb-3">
+        <textarea name="message" class="form-control" rows="4" required>{{ message.message }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Uložiť zmeny</button>
+    <a href="{{ url_for('lesson_discussion', lesson_id=lesson_id) }}" class="btn btn-secondary">Späť</a>
+</form>
+{% endblock %}

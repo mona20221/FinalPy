@@ -42,6 +42,7 @@
             <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Domov</a></li>
              <li class="nav-item"><a class="nav-link" href="{{ url_for('about') }}">O nás</a></li>
             {% if current_user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('create_lesson') }}">Vytvoriť kurz</a></li>
             <li class="nav-item d-flex align-items-center">
                 <form action="{{ url_for('logout') }}" method="post" style="display:inline;">
                     <button type="submit" class="btn btn-link nav-link p-0 m-0" style="border: none; background: none;">

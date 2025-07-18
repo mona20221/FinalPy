@@ -92,11 +92,139 @@ def join_lesson(lesson_id):
 
 
 @app.route('/lessons/create', methods=['GET', 'POST'])
+@login_required
 def create_lesson():
-    # if request.method == 'POST':
+    if request.method == 'POST':
+        title = request.form.get('title')
+        description = request.form.get('description')
+        subject = request.form.get('subject')
+        level = request.form.get('level')
+        termin_datum = request.form.get('termin_datum')
+        termin_cas = request.form.get('termin_cas')
+        termin_miesto = request.form.get('termin_miesto')
 
-    # Tu bude logika na vytvorenie novej lekcie
-    return "Tu bude formulár na vytvorenie lekcie"
+        if not title or not subject or not level or not termin_miesto:
+            flash('Povinné polia musia byť vyplnené', 'danger')
+            return redirect(url_for('create_lesson'))
+
+        if termin_miesto == 'SpeedLearn_office' and (not termin_datum or not termin_cas):
+            flash('Dátum a čas sú povinné pre miesto SpeedLearn_office.', 'danger')
+            return redirect(url_for('create_lesson'))
+
+        # 1. vytvorenie kurzu
+        new_lesson = Lesson(
+            title = title,
+            description = description,
+            subject = subject,
+            level = level,
+            status = 'active',
+            created_by = current_user.id,
+        )
+        db.session.add(new_lesson)
+        db.session.flush()   # nove id pre commitom
+
+        # 2. vytvorenie terminu
+        new_termin = LessonTermin(
+            lesson_id = new_lesson.id,
+            datum = termin_datum,
+            cas = termin_cas,
+            miesto = termin_miesto
+        )
+        db.session.add(new_termin)
+
+        # 3. Pridanie trenera
+        trainer_link = LessonTrainer(lesson_id = new_lesson.id, user_id = current_user.id)
+        db.session.add(trainer_link)
+
+        db.session.commit()
+        flash('Kurz bol úspešne vytvorený', 'success')
+        return redirect(url_for('view_lesson', lesson_id=new_lesson.id))
+
+    return render_template('create_lesson.html')
+
+
+# zrusenie lesson cez ucitela
+@app.route('/lessons/<int:lesson_id>/cancel', methods=['POST'])
+@login_required
+def cancel_lesson(lesson_id):
+    lesson = Lesson.query.get_or_404(lesson_id)
+
+    # over, či aktuálny user je medzi školiteľmi
+    is_trainer = LessonTrainer.query.filter_by(
+        lesson_id=lesson.id,
+        user_id=current_user.id
+    ).first()
+
+    if not is_trainer:
+        flash('Nemáte oprávnenie zrušiť tento kurz.', 'danger')
+        return redirect(url_for('view_lesson', lesson_id=lesson.id))
+
+    lesson.status = 'closed'
+    db.session.commit()
+    flash('Kurz bol úspešne zrušený.', 'success')
+    return redirect(url_for('index'))
+
+# diskusia k lessons
+@app.route('/lessons/<int:lesson_id>/discussion', methods=['GET', 'POST'])
+@login_required
+def lesson_discussion(lesson_id):
+    lesson = Lesson.query.get_or_404(lesson_id)
+
+    # Zoznam účastníkov
+    trainer_ids = [lt.user_id for lt in LessonTrainer.query.filter_by(lesson_id=lesson_id).all()]
+    student_ids = [sl.student_id for sl in StudentLesson.query.filter_by(lesson_id=lesson_id).all()]
+    allowed_user_ids = trainer_ids + student_ids
+
+    # Prístup len pre účastníkov
+    if current_user.id not in allowed_user_ids:
+        flash('Nemáte prístup k tejto diskusii.', 'danger')
+        return redirect(url_for('view_lesson', lesson_id=lesson_id))
+
+    if request.method == 'POST':
+        content = request.form.get('message')
+        if content:
+            # Odošle správu "všetkým" ako kópiu (technicky každému účastníkovi okrem seba)
+            for uid in allowed_user_ids:
+                new_msg = Message(
+                    sender_id=current_user.id,
+                    receiver_id=uid,
+                    message=content
+                )
+                db.session.add(new_msg)
+            db.session.commit()
+            flash('Správa odoslaná.', 'success')
+            return redirect(url_for('lesson_discussion', lesson_id=lesson_id))
+
+    # Zobraz len správy medzi účastníkmi
+    messages = Message.query.filter(
+        Message.sender_id.in_(allowed_user_ids),
+        Message.receiver_id.in_(allowed_user_ids)
+    ).order_by(Message.sent_at.asc()).all()
+
+    return render_template('lesson_discussion.html', lesson=lesson, messages=messages)
+
+# editovanie sprav
+@app.route('/lessons/<int:lesson_id>/messages/<int:message_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_message(lesson_id, message_id):
+    message = Message.query.get_or_404(message_id)
+
+    if message.sender_id != current_user.id:
+        flash('Nemáte oprávnenie upraviť túto správu.', 'danger')
+        return redirect(url_for('lesson_discussion', lesson_id=lesson_id))
+
+    if request.method == 'POST':
+        new_message = request.form.get('message')
+        if not new_message:
+            flash('Správa nesmie byť prázdna.', 'warning')
+        else:
+            message.message = new_message
+            db.session.commit()
+            flash('Správa bola upravená.', 'success')
+            return redirect(url_for('lesson_discussion', lesson_id=lesson_id))
+
+    return render_template('edit_message.html', lesson_id=lesson_id, message=message)
+
 
 
 

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Vytvoriť nový kurz</h2>
+    <form method="post">
+        <div class="mb-3">
+            <label for="title" class="form-label">Názov kurzu</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Popis</label>
+            <textarea class="form-control" id="description" name="description"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="subject" class="form-label">Úroveň školitela</label>
+            <select class="form-select" id="subject" name="subject" required>
+                <option value="">-- Vyber --</option>
+                <option value="Level_A">Level_A</option>
+                <option value="Level_B">Level_B</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="level" class="form-label">Úroveň</label>
+            <input type="text" class="form-control" id="level" name="level">
+        </div>
+      <div class="mb-3">
+        <label for="termin_datum" class="form-label">Dátum termínu</label>
+        <input type="date" class="form-control" id="termin_datum" name="termin_datum" required>
+      </div>
+      <div class="mb-3">
+        <label for="termin_cas" class="form-label">Čas termínu</label>
+        <input type="time" class="form-control" id="termin_cas" name="termin_cas" required>
+      </div>
+      <div class="mb-3">
+        <label for="termin_miesto" class="form-label">Miesto konania</label>
+        <input type="text" class="form-control" id="termin_miesto" name="termin_miesto" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Vytvoriť kurz</button>
+    </form>
+</div>
+{% endblock %}

@@ -53,6 +53,12 @@
                     <li>Žiadni školitelia nepriradení.</li>
                 {% endfor %}
             </ul>
+            {% set trainer_ids = trainers | map(attribute='id') | list %}
+            {% if current_user.is_authenticated and current_user.id in trainer_ids and lesson.status == 'active' %}
+                <form action="{{ url_for('cancel_lesson', lesson_id=lesson.id) }}" method="post" class="mt-4 text-center">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Naozaj chcete zrušiť tento kurz?')">Zrušiť kurz</button>
+                </form>
+            {% endif %}
         </div>
     </div>
 
@@ -95,6 +101,8 @@
         </div>
     </div>
 </div>
-
+<a href="{{ url_for('lesson_discussion', lesson_id=lesson.id) }}" class="btn btn-outline-secondary btn-sm mt-3">
+    Diskusia
+</a>
 
 {% endblock %}
