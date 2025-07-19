@@ -1,4 +1,6 @@
-from flask import Flask
+import json
+import os
+from flask import Flask, jsonify
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 from extensions import db, bcrypt
@@ -188,7 +190,8 @@ def lesson_discussion(lesson_id):
                 new_msg = Message(
                     sender_id=current_user.id,
                     receiver_id=uid,
-                    message=content
+                    message=content,
+                    lesson_id=lesson_id
                 )
                 db.session.add(new_msg)
             db.session.commit()
@@ -197,6 +200,7 @@ def lesson_discussion(lesson_id):
 
     # Zobraz len správy medzi účastníkmi
     messages = Message.query.filter(
+        Message.lesson_id == lesson_id,
         Message.sender_id.in_(allowed_user_ids),
         Message.receiver_id.in_(allowed_user_ids)
     ).order_by(Message.sent_at.asc()).all()
@@ -208,6 +212,11 @@ def lesson_discussion(lesson_id):
 @login_required
 def edit_message(lesson_id, message_id):
     message = Message.query.get_or_404(message_id)
+
+# kontrola ci sprava patri do lekcie
+    if message.lesson_id != lesson_id:
+        flash('Táto správa nepatrí do vybranej lekcie.', 'danger')
+        return redirect(url_for('lesson_discussion', lesson_id=lesson_id))
 
     if message.sender_id != current_user.id:
         flash('Nemáte oprávnenie upraviť túto správu.', 'danger')
@@ -226,7 +235,35 @@ def edit_message(lesson_id, message_id):
     return render_template('edit_message.html', lesson_id=lesson_id, message=message)
 
 
+# formular na odoslanie v json
+@app.route('/submit_about', methods=['POST'])
+def submit_about():
+    data = request.get_json()
+    print('Priajá správa: ', data)
 
+    file_path = os.path.join('static', 'json', 'about_data.json')
+
+    #ulozenie do json
+    with open(file_path, 'w', encoding='utf-8') as json_file:
+        json.dump(data, json_file, ensure_ascii=False, indent=2)
+
+    return jsonify({'message': 'Ďakujeme za hodnotenie'})
+
+# zobrazenie formulara
+@app.route('/view_about_data')
+@login_required
+def view_about_data():
+    if current_user.username != 'admin':
+        return jsonify({'error': 'Prístup zamietnutý'}), 403
+
+    file_path = os.path.join('static', 'json', 'about_data.json')
+
+    if not os.path.exists(file_path):
+        return jsonify({'message': 'Súbor s dátami ešte neexistuje.'})
+
+    with open(file_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    return jsonify(data)
 
 # Registrácia
 @app.route('/register', methods=['GET', 'POST'])

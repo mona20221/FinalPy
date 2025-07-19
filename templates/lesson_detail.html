@@ -95,14 +95,21 @@
                 {% endif %}
             {% else %}
                 <div class="alert alert-warning mt-3 text-center">
-                    Ak sa chcete prihlásiť na kurz, musíte byť<a href="{{ url_for('login') }}">prihlásený užívateľ</a>.
+                    Ak sa chcete prihlásiť na kurz, musíte byť<a href="{{ url_for('login') }}">prihlásený používateľ</a>.
                 </div>
             {% endif %}
         </div>
     </div>
 </div>
-<a href="{{ url_for('lesson_discussion', lesson_id=lesson.id) }}" class="btn btn-outline-secondary btn-sm mt-3">
-    Diskusia
-</a>
+<div class="mb-3">
+    <a href="{{ url_for('lesson_discussion', lesson_id=lesson.id) }}" class="btn btn-outline-secondary btn-sm mt-3">
+        Diskusia
+    </a>
+</div>
+<div class="border border-info p-2">
+    <div class="alert alert-info mb-0">
+        <strong>Info!</strong> Diskusia slúži ako chat, určená najmä pre organizovanie školenia, ako napr. linky na online školenie, doplňujúce informácie. Je dostupná len pre účastníkov kurzu.
+    </div>
+</div>
 
 {% endblock %}

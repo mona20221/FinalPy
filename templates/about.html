@@ -17,9 +17,31 @@
                     <h3 class="text-info mt-4">Kontakt</h3>
                     <ul class="list-unstyled">
                         <li><strong>Email:</strong> <a href="mailto:info@speedlearn.sk">info@speedlearn.sk</a></li>
-                        <li><strong>Telefón:</strong> +421 901 234 567</li>
+                        <li><strong>Telefón:</strong> +421 121 234 111</li>
                         <li><strong>Adresa:</strong> Vzdelávacia ulica 42, 821 01 Bratislava</li>
                     </ul>
+
+                    <h5 class="text-info mt-2 mb-2 d-flex align-items-center" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#aboutFormCollapse" aria-expanded="false" aria-controls="aboutFormCollapse" id="collapseToggle">
+                        Pošli nám pripomienky k tomuto projektu
+                        <span class="ms-2 transition" id="arrow" style="display: inline-block; transition: transform 0.3s;">▼</span>
+                    </h5>
+                    <div class="collapse" id="aboutFormCollapse">
+                        <form id="aboutForm" style="max-width: 400px;">
+                            <div class="mb-2">
+                                <label for="name" class="form-label small">Meno</label>
+                                <input type="text" class="form-control form-control-sm" id="name" name="name" required>
+                            </div>
+                            <div class="mb-2">
+                                <label for="email" class="form-label small">Email</label>
+                                <input type="email" class="form-control form-control-sm" id="email" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="message" class="form-label small">Správa</label>
+                                <textarea class="form-control form-control-sm" id="message" name="message" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm">Odoslať</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -27,25 +49,50 @@
 </div>
 {% endblock %}
 
+{% block scripts %}
+<script>
+document.getElementById('aboutForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const data = {
+    name: this.name.value,
+    email: this.email.value,
+    message: this.message.value
+  };
+
+  fetch('/submit_about', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(result => {
+    alert(result.message);
+    this.reset();
+  })
+  .catch(err => {
+    alert('Chyba pri odosielaní!');
+    console.error(err);
+  });
+});
+</script>
+{% endblock %}
+
 {% block styles %}
 <style>
-    .about-section {
-        background-image:
-        linear-gradient(to bottom, #cce7ff 0%, transparent 20%, transparent 80%, #cce7ff 100%),
-        linear-gradient(to right, #cce7ff 0%, transparent 20%, transparent 80%, #cce7ff 100%),
-        url('{{ url_for("static", filename="images/happy.png") }}');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        min-height: 80vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        color: #003366;
-    }
-
-    .bg-opacity-75 {
-        background-color: rgba(255, 255, 255, 0.75) !important;
-    }
+.about-section {
+    background-image:
+    linear-gradient(to bottom, #cce7ff 0%, transparent 20%, transparent 80%, #cce7ff 100%),
+    linear-gradient(to right, #cce7ff 0%, transparent 20%, transparent 80%, #cce7ff 100%),
+    url('{{ url_for("static", filename="images/happy.png") }}');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #003366;
+}
 </style>
 {% endblock %}
