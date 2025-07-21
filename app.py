@@ -6,6 +6,7 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, curren
 from extensions import db, bcrypt
 from models import User, Member, Lesson, LessonRegistration, LessonTrainer, Message, Student, StudentLesson, LessonTermin
 from datetime import datetime
+from contextlib import contextmanager
 
 
 app = Flask(__name__)
@@ -29,6 +30,17 @@ def load_user(user_id):
 @app.context_processor
 def inject_now():
     return {'now': datetime.today()}
+
+@contextmanager
+def session_scope():
+    try:
+        yield
+        db.session.commit()
+    except:
+        db.session.rollback()
+        raise
+    finally:
+        db.session.close()
 
 # Domovská stránka
 @app.route('/')
@@ -113,34 +125,39 @@ def create_lesson():
             flash('Dátum a čas sú povinné pre miesto SpeedLearn_office.', 'danger')
             return redirect(url_for('create_lesson'))
 
-        # 1. vytvorenie kurzu
-        new_lesson = Lesson(
-            title = title,
-            description = description,
-            subject = subject,
-            level = level,
-            status = 'active',
-            created_by = current_user.id,
-        )
-        db.session.add(new_lesson)
-        db.session.flush()   # nove id pre commitom
+        try:
+            with session_scope():
+                # 1. vytvorenie kurzu
+                new_lesson = Lesson(
+                    title = title,
+                    description = description,
+                    subject = subject,
+                    level = level,
+                    status = 'active',
+                    created_by = current_user.id,
+                )
+                db.session.add(new_lesson)
+                db.session.flush()   # nove id pre commitom
 
-        # 2. vytvorenie terminu
-        new_termin = LessonTermin(
-            lesson_id = new_lesson.id,
-            datum = termin_datum,
-            cas = termin_cas,
-            miesto = termin_miesto
-        )
-        db.session.add(new_termin)
+                # 2. vytvorenie terminu
+                new_termin = LessonTermin(
+                    lesson_id = new_lesson.id,
+                    datum = termin_datum,
+                    cas = termin_cas,
+                    miesto = termin_miesto
+                )
+                db.session.add(new_termin)
 
-        # 3. Pridanie trenera
-        trainer_link = LessonTrainer(lesson_id = new_lesson.id, user_id = current_user.id)
-        db.session.add(trainer_link)
+                # 3. Pridanie trenera
+                trainer_link = LessonTrainer(lesson_id = new_lesson.id, user_id = current_user.id)
+                db.session.add(trainer_link)
 
-        db.session.commit()
-        flash('Kurz bol úspešne vytvorený', 'success')
-        return redirect(url_for('view_lesson', lesson_id=new_lesson.id))
+                flash('Kurz bol úspešne vytvorený', 'success')
+                return redirect(url_for('view_lesson', lesson_id=new_lesson.id))
+
+        except Exception as e:
+            flash('Chyba pri vytváraní kurzu:' + str(e), 'danger')
+            return redirect(url_for('create_lesson'))
 
     return render_template('create_lesson.html')
 
